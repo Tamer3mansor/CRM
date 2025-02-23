@@ -16,10 +16,10 @@ return new class extends Migration {
             $table->string('description')->nullable();
             $table->string('name')->unique();
             $table->dateTime('deadline')->nullable();
-            $table->enum('status', ['inprogress', 'completed', 'late']);
+            $table->enum('status', ['inprogress', 'completed', 'late'])->default('inprogress');
             $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('project_id')->nullable()->constrained('projects')->nullOnDelete();
-
+            $table->softDeletes();
         });
     }
 
