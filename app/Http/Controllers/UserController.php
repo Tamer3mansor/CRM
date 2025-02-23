@@ -109,7 +109,4 @@ class UserController extends Controller
         return response()->json(["message" => "Project assigned successfully"], 201);
     }
 
-
-
-
 }
