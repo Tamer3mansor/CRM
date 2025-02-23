@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Task extends Model
 {
+    use HasFactory;
     protected $guarded = [];
     public function user()
     {
@@ -23,5 +25,16 @@ class Task extends Model
     public function scopeStatus($query, $status = 'completed')
     {
         return $query->where('status', $status);
+    }
+    public function filterScope($query, $filters)
+    {
+        $query->when(!empty($filters['status']), function ($query) use ($filters) {
+            $query->where('status', $filters['status']);
+        });
+        when(!empty($filters['name']), function ($query) use ($filters) {
+            $query->where('name', 'like', "%" . $filters['name'] . "%");
+        });
+        return $query;
+
     }
 }
