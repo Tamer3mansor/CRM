@@ -8,10 +8,10 @@ use App\Models\Project;
 use App\Models\User;
 use \App\Models\Task;
 use Auth;
-use Laravel\Telescope\AuthorizesRequests;
+// use Laravel\Telescope\AuthorizesRequests;
 class UserController extends Controller
 {
-    use AuthorizesRequests;
+    use \Illuminate\Foundation\Auth\Access\AuthorizesRequests;
     public function index($id)
     {
         if (!$this->checkPermission('view-task', 'web'))
