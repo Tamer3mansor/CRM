@@ -60,4 +60,6 @@ class User extends Authenticatable implements MustVerifyEmail
         // return $this->hasMany('')
         return $this->belongsToMany(Project::class, 'project_user', 'user_id', 'project_id');
     }
+    protected $guard_nae = 'user';
+
 }

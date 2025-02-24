@@ -12,9 +12,15 @@ use Illuminate\Support\Facades\Password;
 
 class AuthController extends Controller
 {
+    protected $guard;
+    public function __construct(Request $request)
+    {
+        $this->guard = $request->route('guard');
+        $this->guard = in_array($this->guard, ['admin', 'web']) ? $this->guard : 'web';
+    }
     public function login(Request $request)
     {
-        if (!Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
+        if (!Auth::guard($this->guard)->attempt(['email' => $request->email, 'password' => $request->password])) {
             return response()->json(['Not Found'], 404);
         }
         $user = Auth::user();
@@ -83,7 +89,7 @@ class AuthController extends Controller
     public function logout(Request $request)
     {
         $request->user->token()->delete();
-        // Auth::logout();
+        Auth::guard($this->guard)->logout();
     }
 
 

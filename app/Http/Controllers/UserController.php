@@ -7,10 +7,15 @@ use App\Http\Requests\TaskRequest;
 use App\Models\Project;
 use App\Models\User;
 use \App\Models\Task;
+use Auth;
+use Laravel\Telescope\AuthorizesRequests;
 class UserController extends Controller
 {
+    use AuthorizesRequests;
     public function index($id)
     {
+        if (!$this->checkPermission('view-task', 'web'))
+            return abort(403);
         $user = User::with('tasks:id,name,status,deadline')->findOrFail($id);
         // $tasks = $user->tasks;#()->select('id', 'name')->get();
         return response()->json([
@@ -18,95 +23,43 @@ class UserController extends Controller
 
         ], 200);
     }
-
-    public function editTask($id, TaskRequest $request)
-    { //task id
-        $data = $request->all();
+    public function view_task($id)
+    { // id for task
         $task = Task::findOrFail($id);
+        $task_in_id = $task->user->id;
+        if (!$this->checkPermission('view-task', 'web') or !$this->checkAbility($task_in_id))
+            return abort(403);
+        else
+            return response()->json([
+                "data" => $task,
+
+            ], 200);
+    }
+    public function changeProgress($id, $progress)
+    { //task id
+
+        $task = Task::findOrFail($id);
+        $task_in_id = $task->user->id;
+        $this->authorize('viewTask', $task);
+        // return abort(code: 403);
         // check role
         $task->update(
-            $data
+            ["progress" => $progress]
         );
         return response()->json([
             "data" => $task,
 
         ], 200);
     }
-    public function deleteTask($id)
-    { //task id
 
-        $task = Task::findOrFail($id);
-        // check role
-        $task->delete();
-        return response()->json([
-            "data" => $task,
 
-        ], 200);
-    }
-
-    public function restoreTask($id)
-    { //task id
-
-        $task = Task::onlyTrashed()->findOrFail($id);
-        // check role
-        $task->restore();
-        return response()->json([
-            "data" => $task,
-
-        ], 200);
-    }
-    public function createTask(TaskRequest $request)
+    private function checkAbility($id)
     {
-        $data = $request->all();
-
-        $task = Task::create($data);
-        return response()->json([
-            "data" => $task,
-
-        ], 201);
+        return Auth::user()->id === $id;
     }
-    public function reAssignTask($taskId, $userId)
+    private function checkPermission($permission, $guard)
     {
-        $task = Task::findOrFail($taskId);
-        $user = User::findOrFail($userId);
-        if ($user) {
-            $task->update([
-                'user_id' => $userId
-            ]);
-        }
-        return response()->json([
-            "data" => $task,
-
-        ], 200);
-
-    }
-    public function restore($userid)
-    { //user id
-
-        $user = User::findOrFail($userid);
-        $task = $user->tasks()->onlyTrashed()->restore();
-        // check role
-
-        return response()->json([
-            "data" => $task,
-
-        ], 201);
-    }
-    public function assignProject($userId, $projectId)
-    {
-        // Find the user and project
-        $user = User::findOrFail($userId);
-        // $project = Project::findOrFail($projectId);
-
-        // Check if the user is already assigned to the project
-        if ($user->projects()->where('project_id', $projectId)->exists()) {
-            return response()->json(["message" => "User is already assigned to this project"], 409);
-        }
-
-        // Assign project to user
-        $user->projects()->attach($projectId);
-
-        return response()->json(["message" => "Project assigned successfully"], 201);
+        return Auth::user()->hasPermissionTo([$permission, $guard]);
     }
 
 }
