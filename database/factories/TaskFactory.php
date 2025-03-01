@@ -19,6 +19,7 @@ class TaskFactory extends Factory
             "deadline" => $this->faker->dateTimeBetween('now', '+1 month'),
             "user_id" => User::inRandomOrder()->first()->id,  // Assign random user
             "project_id" => Project::inRandomOrder()->first()->id, // Assign random project
+            "image" => $this->faker->imageUrl(),
         ];
     }
 }

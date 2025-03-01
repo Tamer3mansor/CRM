@@ -30,7 +30,10 @@ class Roles extends Seeder
             "change-progress",
         ];
         foreach ($permissions as $permission) {
-            Permission::create(["name" => $permission]);
+            Permission::create(["name" => $permission, "guard_name" => 'admin']);
+            if (in_array($permission, ["view-task", "change-progress"]))
+                Permission::create(["name" => $permission, "guard_name" => 'web']);
+
         }
         $adminRole->givePermissionTo($permissions);
         $userRole->givePermissionTo(['view-task', 'change-progress']);

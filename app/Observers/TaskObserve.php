@@ -10,7 +10,8 @@ use Illuminate\Support\Facades\Event;
 
 class TaskObserve
 {
-    /**
+    /**composer require spatie/laravel-medialibrary
+
      * Handle the Task "created" event.
      */
     public function created(Task $task): void
