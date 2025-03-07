@@ -115,5 +115,15 @@ class AdminController extends Controller
     {
         return Auth::user()->hasPermissionTo($permission, $guard);
     }
+    public function uploadMedia(Request $request, $task)
+    {
+        if (!$request->hasFile('image')) {
+            return false;
+        }
+        $task->addMedia($request->file('image'))
+            ->usingFileName($task->name . "" . now())
+            ->toMediaCollection('tas-media');
+            return true;
+    }
 
 }

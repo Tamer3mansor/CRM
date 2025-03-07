@@ -4,10 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Laravel\Sanctum\HasApiTokens;
+use Spatie\MediaLibrary\InteractsWithMedia;
 
 class Task extends Model
 {
-    use HasFactory;
+    use HasFactory, InteractsWithMedia, HasApiTokens;
+
     protected $guarded = [];
     public function user()
     {
